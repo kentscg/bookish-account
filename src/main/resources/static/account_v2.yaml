@@ -1,0 +1,108 @@
+openapi: 3.0.3
+info:
+  title: Account Management API
+  description: API for managing user accounts.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/
+paths:
+  /v2/accounts:
+    get:
+      summary: List all accounts
+      description: Retrieves a list of all user accounts with pagination support.
+      operationId: listAccounts
+      tags:
+        - Accounts
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of accounts to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        "200":
+          description: A list of user accounts with pagination details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationV2"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "INVALID_INPUT"
+                  message:
+                    type: string
+                    description: Detailed error message
+                    example: "Invalid email format."
+components:
+  schemas:
+    AccountV2:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier for the account
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        fullName:
+          type: string
+          description: Full name of the user
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: john.doe@example.com
+        dateOfBirth:
+          type: string
+          format: date
+          description: User's date of birth
+          example: "1990-01-01"
+        phoneNumber:
+          type: string
+          description: User's phone number in E.164 format
+          example: "+1234567890"
+        race:
+          type: string
+          description: User's race
+          example: "Malay"
+    PaginationV2:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          description: Total number of items available
+          example: 100
+        totalPages:
+          type: integer
+          description: Total number of pages available
+          example: 10
+        currentPage:
+          type: integer
+          description: The current page number
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of items per page
+          example: 10
+        items:
+          type: array
+          description: List of items for the current page
+          items:
+            $ref: "#/components/schemas/AccountV2"

@@ -1,0 +1,313 @@
+openapi: 3.0.3
+info:
+  title: Account Management API
+  description: API for managing user accounts.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/
+paths:
+  /v1/accounts:
+    post:
+      summary: Create a new account
+      description: Creates a new user account with basic details.
+      operationId: createAccount
+      tags:
+        - Accounts
+      requestBody:
+        description: Account creation details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - password
+              properties:
+                fullName:
+                  type: string
+                  description: Full name of the user (first and last name combined)
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  description: User's account password
+                  example: mySecurePassword123
+                phoneNumber:
+                  type: string
+                  description: User's phone number in E.164 format
+                  example: "+1234567890"
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: User's date of birth
+                  example: "1990-01-01"
+      responses:
+        "201":
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: Unique identifier for the created account
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Account created successfully."
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      deprecated: true
+      summary: List all accounts
+      description: Retrieves a list of all user accounts with pagination support.
+      operationId: listAccounts
+      tags:
+        - Accounts
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of accounts to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        "200":
+          description: A list of user accounts with pagination details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pagination"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/accounts/{accountId}:
+    get:
+      summary: Retrieve a single account
+      description: Retrieves details of a single user account by its ID.
+      operationId: getAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: Account details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update an account
+      description: Updates details of an existing user account.
+      operationId: updateAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        description: Updated account details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  description: Full name of the user (first and last name combined)
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: john.doe@example.com
+                phoneNumber:
+                  type: string
+                  description: User's phone number in E.164 format
+                  example: "+1234567890"
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: User's date of birth
+                  example: "1990-01-01"
+      responses:
+        "200":
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: Unique identifier for the updated account
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Account updated successfully."
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an account
+      description: Deletes an existing user account by its ID.
+      operationId: deleteAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "204":
+          description: Account deleted successfully
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier for the account
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        fullName:
+          type: string
+          description: Full name of the user
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: john.doe@example.com
+        dateOfBirth:
+          type: string
+          format: date
+          description: User's date of birth
+          example: "1990-01-01"
+        phoneNumber:
+          type: string
+          description: User's phone number in E.164 format
+          example: "+1234567890"
+    Pagination:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          description: Total number of items available
+          example: 100
+        totalPages:
+          type: integer
+          description: Total number of pages available
+          example: 10
+        currentPage:
+          type: integer
+          description: The current page number
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of items per page
+          example: 10
+        items:
+          type: array
+          description: List of items for the current page
+          items:
+            $ref: "#/components/schemas/Account"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code indicating the issue
+          example: "INVALID_INPUT"
+        message:
+          type: string
+          description: Detailed error message
+          example: "Invalid email format."
